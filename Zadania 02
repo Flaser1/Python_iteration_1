@@ -1,0 +1,103 @@
+
+
+# Zadania 02
+
+raw_country = " de "
+raw_amount = "250.00"
+status = "paid"
+
+country = raw_country.strip().upper()
+amount = float(raw_amount)
+is_paid = status == "paid"
+amount = amount >= 200
+country = country in ["PL", "DE", "FR"]
+print(is_paid)
+print(amount)
+print(country)
+include_in_report = is_paid and amount and country
+print(include_in_report)
+
+customer_name = "Anna Kowalska"
+orders_count = 3
+paid_orders_count = 2
+cancelled_orders_count = 1
+total_revenue = 249.90
+print(customer_name)
+print(orders_count)
+print(paid_orders_count)
+print(cancelled_orders_count)
+print(total_revenue)
+
+quantity = 3
+unit_price = 19.99
+line_value = quantity * unit_price
+line_value_with_tax = line_value * 1.23
+print(line_value)
+print(line_value_with_tax)
+
+orders_count = 0
+orders_count += 1
+orders_count += 1
+orders_count += 1
+print(orders_count)
+
+status = "paid"
+total_amount = 350
+country = "PL"
+is_paid = status == "paid"
+is_high_value = total_amount >= 300
+is_polish_customer = country == "PL"
+print(is_paid)
+print(is_high_value)
+print(is_polish_customer)
+
+status = "paid"
+total_amount = 350
+country = "PL"
+include_in_report = status == "paid" and total_amount >= 300 and country == "PL"
+print(include_in_report)
+
+country = "DE"
+core_countries = ["PL", "DE", "FR"]
+is_core_country = country in core_countries
+print(is_core_country)
+
+raw_country = " de "
+raw_amount = "250.00"
+status = "paid"
+country = raw_country.strip().upper()
+amount = float(raw_amount)
+print(country in ["PL", "DE", "FR"])
+print(amount >= 200)
+print(status == "paid")
+include_in_report = status = ("paid" and country in ["PL", "DE", "FR"]
+                              and amount >= 200)
+print(include_in_report)
+
+total_amount = 120
+if total_amount >= 300:
+    order_tier = "high"
+else:
+    order_tier = "standard"
+print(order_tier)
+
+print(2+3*4)
+print((2+3) * 4) # Wyniki sa roznia sie przez kolejnosc dzialan w matematyce
+
+status = "paid"
+total_amount = 350
+country = "PL"
+is_paid = status == "paid"
+is_high_value = total_amount >= 300
+is_core_country = country in ["PL", "DE", "FR"]
+include_in_report = is_paid and is_high_value and is_core_country
+print(include_in_report)
+
+status = "paid"
+country = "DE"
+total_amount = 180
+include_in_report = (status == "paid" and country == ("DE" or "PL")
+                     and total_amount >= 100)
+print(include_in_report)
+
+
