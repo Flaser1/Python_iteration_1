@@ -1,0 +1,124 @@
+
+
+# Zadania 01
+
+customer_name = "Anna Kowalska"
+orders_count = 3
+total_amount = 249.90
+is_active = "true"
+email = None
+print(type(customer_name))
+print(type(orders_count))
+print(type(total_amount))
+print(type(is_active))
+print(type(email))
+
+raw_order_id = "1001"
+raw_amount = "129.99"
+raw_quantity = "3"
+
+order_id = int(raw_order_id)
+amount = float(raw_amount)
+quantity = int(raw_quantity)
+print(amount * quantity)
+
+order = {
+    "order_id": "1001",
+    "customer_id": 10,
+    "country": " pl ",
+    "amount": "129.99",
+    "status": "paid"
+}
+print(order["order_id"])
+print(order["status"])
+country = order["country"].strip().upper()
+print(country)
+amount = float(order["amount"])
+print(amount)
+
+print(order.get("discount", 0))
+
+orders = [
+    {"order_id": 1, "amount": 100.0, "status": "paid"},
+    {"order_id": 2, "amount": 200.0, "status": "cancelled"},
+    {"order_id": 3, "amount": 300.0, "status": "paid"}
+]
+print(orders[0])
+print(orders[0]["status"])
+print(orders[1]["amount"])
+print(orders[2]["order_id"])
+
+countries = {"PL", "DE", "PL", "FR", "DE", "PL"}
+print(countries)
+
+date_range = ("2026-10-01", "2026-10-31")
+print(date_range)
+print(date_range[0])
+print(date_range[1])
+print(type(date_range))
+
+orders = [
+    {"order_id": 1, "country": "PL", "amount": "100.50", "status": "paid"},
+    {"order_id": 2, "country": "DE", "amount": "200.00", "status": "cancelled"},
+    {"order_id": 3, "country": "FR", "amount": "300.25", "status": "paid"},
+]
+print(float(orders[0]["amount"]))
+print(orders[1]["country"])
+print(orders[2]["status"])
+summary = (f"First amount: {orders[0]["amount"]}, "
+           f"second country: {orders[1]["country"]},"
+           f" third status: {orders[2]["status"]}")
+print(summary)
+
+raw_order_id = "1001"
+raw_quantity = "3"
+raw_unit_price = "19.99"
+order_id = int(raw_order_id)
+quantity = int(raw_quantity)
+unit_price = float(raw_unit_price)
+line_value = quantity * unit_price
+print(type(order_id))
+print(type(quantity))
+print(type(unit_price))
+print(type(line_value))
+print(order_id)
+print(quantity)
+print(unit_price)
+print(line_value)
+
+from decimal import Decimal
+
+print(0.1 + 0.2)
+print(0.1 + 0.2 == 0.3)
+amount = Decimal("0.1") + Decimal("0.2")
+print(amount)
+print(amount == Decimal("0.3"))
+
+email_1 = None
+email_2 = ""
+orders_count = 0
+
+if email_1 == None:
+    print("email_1 is missing")
+if email_2 == "":
+    print("email_2 is empty")
+if orders_count == 0:
+    print("orders_count is zero")
+
+# Zadania 02
+
+raw_country = " de "
+raw_amount = "250.00"
+status = "paid"
+
+country = raw_country.strip().upper()
+amount = float(raw_amount)
+is_paid = status == "paid"
+amount = amount >= 200
+country = country in ["PL", "DE", "FR"]
+print(is_paid)
+print(amount)
+print(country)
+include_in_report = is_paid and amount and country
+print(include_in_report)
+
