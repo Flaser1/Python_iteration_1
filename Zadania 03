@@ -1,0 +1,86 @@
+
+
+# Zadania 03
+
+raw_country = " pl "
+raw_status = " Paid "
+date = "2026-10-10"
+page = 2
+country = raw_country.strip().upper()
+status = raw_status.strip().lower()
+path = f"data/raw/orders_{date}_page_{page}.json"
+print(path)
+
+raw_country = " pl "
+country = raw_country.strip().upper()
+print(country)
+
+raw_status = " Paid "
+status = raw_status.strip().lower()
+print(status)
+
+raw_amount = "129,99"
+amount = raw_amount.replace(",", ".")
+print(amount)
+
+email = "ANNA.KOWALSKA@EXAMPLE.COM"
+email = email.lower()
+print(email)
+if "@" in email:
+    print("email contrains @")
+
+file_name = "orders_2026_10_12.json"
+print(file_name.startswith("orders"))
+print(file_name.endswith("json"))
+
+line = "1001,paid,129.99"
+line = line.split(",")
+order_id = line[0]
+status = line[1]
+amount = line[2]
+print(order_id)
+print(status)
+print(amount)
+
+customer_name = "Anna Kowalska"
+orders_count = 3
+total_revenue = 249.9
+print(f"Klient {customer_name} ma {orders_count} o wartosci {total_revenue}")
+
+date = "2026-10-12"
+page = 4
+source = "orders"
+file_path = f"data/raw/{source}_{date}_page_{page}.json"
+print(file_path)
+
+raw_country = None
+if raw_country is None:
+    country = "UNKNOWN"
+else:
+    country = raw_country.strip().upper()
+print(country)
+
+country = " pl "
+country.strip().upper()
+print(country)
+country = country.strip().upper()
+print(country)
+
+email_1 = None
+email_2 = ""
+email_3 = "   "
+email_4 = " ANNA@EXAMPLE.COM "
+if email_1 is None:
+    print("missing")
+if email_2 == "":
+    print("empty")
+if email_3.strip() == "":
+    print("empty")
+email_4 = email_4.strip().lower()
+print(email_4)
+
+file_name = " orders_2026_10_10.JSON "
+file_name = file_name.strip().lower()
+print(file_name.startswith("orders"))
+print(file_name.endswith(".json"))
+
