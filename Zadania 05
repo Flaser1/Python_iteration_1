@@ -1,0 +1,151 @@
+
+
+# Zadania 05
+
+orders = [
+    {"order_id": 1, "total": 100, "status": "paid"},
+    {"order_id": 2, "total": 200, "status": "cancelled"},
+    {"order_id": 3, "total": 300, "status": "paid"},
+]
+total_amount = 0
+for order in orders:
+    total_amount = total_amount + order["total"]
+print(total_amount)
+paid_orders_count = 0
+for paid_orders in orders:
+    if paid_orders["status"] == "paid":
+        paid_orders_count = paid_orders_count + 1
+print(paid_orders_count)
+cancelled_orders_count = 0
+for cancelled_orders in orders:
+    if cancelled_orders["status"] == "cancelled":
+        cancelled_orders_count = cancelled_orders_count + 1
+print(cancelled_orders_count)
+
+orders = [
+    {"order_id": 1, "amount": 100.0, "status": "paid", "country": "PL"},
+    {"order_id": 2, "amount": 200.0, "status": "cancelled", "country": "DE"},
+    {"order_id": 3, "amount": 300.0, "status": "paid", "country": "PL"},
+    {"order_id": 4, "amount": 50.0, "status": "pending", "country": "FR"},
+    {"order_id": 5, "amount": 500.0, "status": "paid", "country": "DE"},
+]
+for order in orders:
+    print(order["order_id"])
+
+orders_count = 0
+for order in orders:
+    orders_count = orders_count + 1
+print(orders_count)
+
+paid_orders_count = 0
+for paid_orders in orders:
+    if paid_orders["status"] == "paid":
+        paid_orders_count = paid_orders_count + 1
+    print(paid_orders_count)
+
+total_revenue = 0
+for order in orders:
+    total_revenue = total_revenue + order["amount"]
+print(total_revenue)
+
+paid_revenue = 0
+for paid_order in orders:
+    if paid_order["status"] == "paid":
+        paid_revenue = paid_revenue + paid_order["amount"]
+print(paid_revenue)
+
+paid_orders = []
+for order in orders:
+    if order["status"] == "paid":
+        paid_orders.append(order)
+print(paid_orders)
+
+for order in orders:
+    if order["amount"] >= 200:
+        high_value_orders = order
+        print(order)
+
+pl_orders_count = 0
+for order in orders:
+    if order["country"] == "PL":
+        pl_orders_count += 1
+print(pl_orders_count)
+
+for order in orders:
+    print(f"Order {order["order_id"]} is {order["status"]}")
+
+for order in orders:
+    if order["status"] == "cancelled":
+        continue
+    print(order)
+
+for order in orders:
+    if order["amount"] >= 300:
+        print(order)
+        break
+
+orders_count = 0
+paid_orders_count = 0
+cancelled_orders_count = 0
+pending_orders_count = 0
+total_revenue = 0
+paid_revenue = 0
+high_value_orders_count = 0
+for order in orders:
+    orders_count += 1
+for order in orders:
+    if order["status"] == "paid":
+        paid_orders_count += 1
+for order in orders:
+    if order["status"] == "cancelled":
+        cancelled_orders_count += 1
+for order in orders:
+    if order["status"] == "pending":
+        pending_orders_count += 1
+for order in orders:
+    total_revenue = total_revenue + order["amount"]
+for order in orders:
+    if order["status"] == "paid":
+        paid_revenue = paid_revenue + order["amount"]
+for order in orders:
+    if order["amount"] >= 200:
+        high_value_orders_count += 1
+print(f"orders_count: {orders_count}, paid_orders_count: {paid_orders_count}, "
+      f"cancelled_orders_count: {cancelled_orders_count}, "
+      f"pending_orders_count: {pending_orders_count}, "
+      f"total_revenue: {total_revenue}, paid_revenue: {paid_revenue}, "
+      f"high_value_orders_count: {high_value_orders_count}")
+
+values = [None, "", 0, [], {}, "PL", 10]
+for value in values:
+    if value:
+        print("truthy")
+    else:
+        print("falsy")
+
+for number in range(5):
+    print(number)
+countries = ["PL", "DE", "FR"]
+for index, country in enumerate(countries):
+    print(index, country)
+
+order = {
+    "order_id": 1001,
+    "total": 129.99,
+    "status": "paid",
+}
+for key, value in order.items():
+    print(key, value)
+
+orders = [
+    {"order_id": 1, "total": 100, "status": "paid"},
+    {"order_id": 2, "total": 200, "status": "cancelled"},
+    {"order_id": 3, "total": 300, "status": "paid"},
+]
+for order in orders:
+    if order["status"] == "cancelled":
+        continue
+    print(order["order_id"], order["total"])
+
+
+
