@@ -1,0 +1,143 @@
+
+
+# Zadania 06
+
+def normalize_country(country: str) -> str:
+    return country.strip().upper()
+def main() -> None:
+    raw_country = " pl "
+    country = normalize_country(raw_country)
+    print(country)
+if __name__ == "__main__":
+    main()
+
+def normalize_country2(country: str) -> str:
+    return country.strip().upper()
+print(normalize_country2(" pl "))
+print(normalize_country2("de"))
+print(normalize_country2(" Fr "))
+
+def calculate_line_value(quantity: int, unit_price: float) -> float:
+    return quantity * unit_price
+print(calculate_line_value(3, 19.99))
+
+def is_paid(status: str) -> bool:
+    if status.strip().lower() == "paid":
+        return True
+    else:
+        return False
+print(is_paid("paid"))
+print(is_paid(" Paid "))
+print(is_paid("cancelled"))
+
+def get_order_value(order: dict) -> float:
+    return order["quantity"] * order["unit_price"]
+order = {
+    "order_id": 1001,
+    "quantity": 4,
+    "unit_price": 25.50
+}
+print(get_order_value(order))
+
+def build_order_summary(order: dict) -> dict:
+    return \
+        {
+            "order_id": order["order_id"],
+            "customer_id": order["customer_id"],
+            "order_value": get_order_value(order),
+            "is_paid": is_paid(order["status"])
+    }
+order = {
+    "order_id": 1001,
+    "customer_id": 10,
+    "quantity": 4,
+    "unit_price": 25.50,
+    "status": " Paid ",
+}
+print(build_order_summary(order))
+
+def get_order_segment(order_value: float) -> str:
+    if order_value >= 200:
+        return "high"
+    elif order_value >= 100:
+        return "medium"
+    else:
+        return "low"
+
+
+def transform_order(raw_order: dict) -> dict:
+    return {
+        "order_id": int(raw_order["id"]),
+        "country": raw_order["country"].strip().upper(),
+        "amount": float(raw_order["amount"]),
+        "status": raw_order["status"].strip().lower(),
+        "segment": get_order_segment(float(raw_order["amount"]))
+    }
+raw_order = {
+    "id": "1001",
+    "country": " pl ",
+    "amount": "250.50",
+    "status": " Paid ",
+}
+print(transform_order(raw_order))
+
+def main() -> None:
+    raw_order = {
+        "id": "1004",
+        "country": " dE ",
+        "amount": "223.70",
+        "status": " caNcelled ",
+    }
+    order = transform_order(raw_order)
+    print(order)
+
+if __name__ == "__main__":
+    main()
+
+from datetime import date
+def main() -> None:
+    today = date.today()
+    print(today)
+main()
+
+def calculate_total(quantity: int, unit_price: float) -> float:
+    return quantity * unit_price
+total = calculate_total(2, 50)
+print(total + 10)
+
+def greet(name: str = "unknown") -> str:
+   return f"Hello {name}"
+print(greet("Anna"))
+print(greet())
+
+# Byl None, bo nie bylo return
+def calculate_total(quantity: int, unit_price: float) -> float:
+    return quantity * unit_price
+result = calculate_total(2, 50)
+print(result)
+
+# Nie dostaje bledu
+def calculate_total() -> float:
+    total = 100
+    return total
+print(total)
+
+def normalize_status(status: str) -> str:
+    return order["status"].strip().lower()
+def calculate_order_value(order: dict) -> float:
+    return order["quantity"] * order["unit_price"]
+print(calculate_order_value(order))
+def build_order_result(order: dict) -> dict:
+    return {
+        "order_id": order["order_id"],
+        "status": normalize_status(order),
+        "order_value": calculate_order_value(order)
+    }
+print(build_order_result(order))
+order = {
+    "order_id": 1001,
+    "quantity": 3,
+    "unit_price": 20,
+    "status": " Paid ",
+}
+
