@@ -1,0 +1,228 @@
+
+
+
+def normalize_text(value: str) -> str:
+    value = value.strip()
+    return value
+
+def normalize_country(country: str | None) -> str:
+    if country is None or country.strip() == "":
+        return "UNKNOWN"
+    return country.strip().upper()
+
+def normalize_status(status: str) -> str:
+    return status.strip().lower()
+
+def normalize_email(email: str | None) -> str:
+    if email is None or email.strip() == "":
+        return "missing_email"
+    return email.strip().lower()
+
+def parse_int(value: str) -> int:
+    try:
+        return int(value)
+    except ValueError:
+        return 0
+
+def parse_float(value: str) -> float:
+    try:
+        return float(value)
+    except ValueError:
+        return 0
+
+def is_paid(status: str) -> bool:
+    if status == "paid":
+        is_paid = True
+    else:
+        is_paid = False
+    return is_paid
+
+def get_order_tier(order_value: float) -> str:
+    if order_value >= 300:
+        order_tier = "high"
+    elif order_value >= 100:
+        order_tier = "standard"
+    else:
+        order_tier = "low"
+    return order_tier
+
+def validate_order(raw_order: dict) -> None:
+    is_valid = True
+    if parse_int(raw_order["quantity"]) == 0:
+        return is_valid == False
+    if parse_float(raw_order["unit_price"]) == 0:
+        return is_valid == False
+    if "order_id" not in raw_order:
+        return is_valid == False
+    if "customer_id" not in raw_order:
+        return is_valid == False
+    if "customer_name" not in raw_order:
+        return is_valid == False
+    if "country" not in raw_order:
+        return is_valid == False
+    if "quantity" not in raw_order:
+        return is_valid == False
+    if "unit_price" not in raw_order:
+        return is_valid == False
+    if "status" not in raw_order:
+        return is_valid == False
+    if "email" not in raw_order:
+        return is_valid == False
+
+def transform_order(raw_order: dict) -> dict:
+    order_value = parse_int(raw_order["quantity"]) * parse_float(raw_order["unit_price"])
+    return {
+        "order_id": parse_int(raw_order["order_id"]),
+        "customer_id": int(raw_order["customer_id"]),
+        "customer_name": normalize_text(raw_order["customer_name"]),
+        "country": normalize_country(raw_order.get("country")),
+        "quantity": parse_int(raw_order["quantity"]),
+        "unit_price": parse_float(raw_order["unit_price"]),
+        "order_value": order_value,
+        "status": normalize_status(raw_order["status"]),
+        "email": normalize_email(raw_order.get("email")),
+        "is_paid": is_paid(raw_order["status"]),
+        "order_tier": get_order_tier(order_value)
+    }
+
+def calculate_metrics(clean_orders: list[dict], invalid_orders: list[dict]) -> dict:
+    raw_orders_count = len(clean_orders) + len(invalid_orders)
+    valid_orders_count = len(clean_orders)
+    invalid_orders_count = len(invalid_orders)
+    paid_orders_count = 0
+    cancelled_orders_count = 0
+    pending_orders_count = 0
+    paid_revenue = 0
+    total_revenue = 0
+    high_orders_count = 0
+    countries = []
+    unique_countries_count = 0
+    for clean_order in clean_orders:
+        if clean_order["status"] == "paid":
+            paid_orders_count += 1
+            paid_revenue += clean_order["order_value"]
+            total_revenue += clean_order["order_value"]
+        elif clean_order["status"] == "cancelled":
+            cancelled_orders_count += 1
+            total_revenue += clean_order["order_value"]
+        else:
+            pending_orders_count += 1
+            total_revenue += clean_order["order_value"]
+        if clean_order["order_tier"] == "high":
+            high_orders_count += 1
+        countries.append(clean_order["country"])
+        unique_countries_count = len(set(countries))
+    return {
+        "raw_orders_count": raw_orders_count,
+        "valid_orders_count": valid_orders_count,
+        "invalid_orders_count": invalid_orders_count,
+        "paid_orders_count": paid_orders_count,
+        "cancelled_orders_count": cancelled_orders_count,
+        "pending_orders_count": pending_orders_count,
+        "paid_revenue": paid_revenue,
+        "total_revenue": total_revenue,
+        "high_orders_count": high_orders_count,
+        "unique_countries_count": unique_countries_count,
+    }
+
+
+def print_report(metrics: dict) -> None:
+        print(f"{calculate_metrics()["paid_revenue"]}")
+
+
+def main() -> None:
+    raw_orders = [
+        {
+            "order_id": "1001",
+            "customer_id": "1",
+            "customer_name": " Anna Kowalska ",
+            "country": " pl ",
+            "quantity": "2",
+            "unit_price": "49.99",
+            "status": " Paid ",
+            "email": " ANNA@example.COM ",
+        },
+        {
+            "order_id": "1002",
+            "customer_id": "2",
+            "customer_name": "Jan Nowak",
+            "country": "DE",
+            "quantity": "1",
+            "unit_price": "199.90",
+            "status": "cancelled",
+            "email": None,
+        },
+        {
+            "order_id": "1003",
+            "customer_id": "3",
+            "customer_name": " Marta ",
+            "country": " fr ",
+            "quantity": "bad-data",
+            "unit_price": "29.99",
+            "status": "paid",
+            "email": "marta@example.com",
+        },
+        {
+            "order_id": "1004",
+            "customer_id": "4",
+            "customer_name": "Piotr Zielinski",
+            "country": "",
+            "quantity": "5",
+            "unit_price": "15.50",
+            "status": " pending ",
+            "email": "   ",
+        },
+        {
+            "order_id": "1005",
+            "customer_id": "5",
+            "customer_name": "Julia",
+            "country": "PL",
+            "quantity": "3",
+            "unit_price": "120.00",
+            "status": "PAID",
+            "email": "julia@example.com",
+        },
+        {
+            "order_id": "1006",
+            "customer_id": "6",
+            "customer_name": "Tomasz",
+            "country": "ES",
+            "quantity": "2",
+            "unit_price": "abc",
+            "status": "paid",
+            "email": "tomasz@example.com",
+        },
+        {
+            "order_id": "1007",
+            "customer_id": "7",
+            "customer_name": "Ewa",
+            "country": None,
+            "quantity": "1",
+            "unit_price": "89.99",
+            "status": "paid",
+            "email": "ewa@example.com",
+        },
+    ]
+
+    clean_orders = []
+    invalid_orders = []
+
+    for raw_order in raw_orders:
+        validate_orders = validate_order(raw_order)
+        clean_order = transform_order(raw_order)
+        if validate_orders == False:
+            invalid_orders.append(raw_order)
+        else:
+            clean_orders.append(clean_order)
+
+    calculate_metrics(clean_orders, invalid_orders)
+    print_report(calculate_metrics)
+
+
+    print(clean_orders)
+    print(invalid_orders)
+if __name__ == "__main__":
+    main()
+
+
+
