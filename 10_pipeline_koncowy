@@ -11,10 +11,14 @@ def normalize_country(country: str | None) -> str:
     return country.strip().upper()
 
 def normalize_status(status: str) -> str:
-    return status.strip().lower()
+    status = status.strip().lower()
+    return status
 
 def normalize_email(email: str | None) -> str:
-    if email is None or email.strip() == "":
+    if type(email) != str:
+        if email is None:
+            return "missing_email"
+    elif email.strip() == "":
         return "missing_email"
     return email.strip().lower()
 
@@ -96,7 +100,6 @@ def calculate_metrics(clean_orders: list[dict], invalid_orders: list[dict]) -> d
     total_revenue = 0
     high_orders_count = 0
     countries = []
-    unique_countries_count = 0
     for clean_order in clean_orders:
         if clean_order["status"] == "paid":
             paid_orders_count += 1
@@ -111,7 +114,7 @@ def calculate_metrics(clean_orders: list[dict], invalid_orders: list[dict]) -> d
         if clean_order["order_tier"] == "high":
             high_orders_count += 1
         countries.append(clean_order["country"])
-        unique_countries_count = len(set(countries))
+    unique_countries_count = len(set(countries))
     return {
         "raw_orders_count": raw_orders_count,
         "valid_orders_count": valid_orders_count,
@@ -127,7 +130,16 @@ def calculate_metrics(clean_orders: list[dict], invalid_orders: list[dict]) -> d
 
 
 def print_report(metrics: dict) -> None:
-        print(f"{calculate_metrics()["paid_revenue"]}")
+        print(f"Raw orders count: {metrics["raw_orders_count"]}")
+        print(f"Valid orders count: {metrics["valid_orders_count"]}")
+        print(f"Invalid orders count: {metrics["invalid_orders_count"]}")
+        print(f"Paid orders count: {metrics["paid_orders_count"]}")
+        print(f"Cancelled orders count: {metrics["cancelled_orders_count"]}")
+        print(f"Pending orders count: {metrics["pending_orders_count"]}")
+        print(f"Paid revenue: {metrics["paid_revenue"]:.2f}")
+        print(f"Total revenue: {metrics["total_revenue"]:.2f}")
+        print(f"High orders count: {metrics["high_orders_count"]}")
+        print(f"Unique countries count: {metrics["unique_countries_count"]}")
 
 
 def main() -> None:
@@ -214,9 +226,10 @@ def main() -> None:
             invalid_orders.append(raw_order)
         else:
             clean_orders.append(clean_order)
+            continue
 
-    calculate_metrics(clean_orders, invalid_orders)
-    print_report(calculate_metrics)
+    metrics = calculate_metrics(clean_orders, invalid_orders)
+    print_report(metrics)
 
 
     print(clean_orders)
