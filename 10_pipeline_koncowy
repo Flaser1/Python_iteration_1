@@ -2,8 +2,7 @@
 
 
 def normalize_text(value: str) -> str:
-    value = value.strip()
-    return value
+    return value.strip()
 
 def normalize_country(country: str | None) -> str:
     if country is None or country.strip() == "":
@@ -11,16 +10,13 @@ def normalize_country(country: str | None) -> str:
     return country.strip().upper()
 
 def normalize_status(status: str) -> str:
-    status = status.strip().lower()
-    return status
+    return status.strip().lower()
 
 def normalize_email(email: str | None) -> str:
     if type(email) != str:
-        if email is None:
-            return "missing_email"
-    elif email.strip() == "":
         return "missing_email"
-    return email.strip().lower()
+    cleaned = email.strip().lower()
+    return "missing_email" if cleaned == "" else cleaned
 
 def parse_int(value: str) -> int:
     try:
@@ -35,43 +31,31 @@ def parse_float(value: str) -> float:
         return 0
 
 def is_paid(status: str) -> bool:
-    if status == "paid":
-        is_paid = True
-    else:
-        is_paid = False
-    return is_paid
+    return normalize_status(status) == "paid"
 
 def get_order_tier(order_value: float) -> str:
     if order_value >= 300:
-        order_tier = "high"
-    elif order_value >= 100:
-        order_tier = "standard"
-    else:
-        order_tier = "low"
-    return order_tier
+        return "high"
+    if order_value >= 100:
+        return "standard"
+    return "low"
 
 def validate_order(raw_order: dict) -> None:
-    is_valid = True
-    if parse_int(raw_order["quantity"]) == 0:
-        return is_valid == False
-    if parse_float(raw_order["unit_price"]) == 0:
-        return is_valid == False
-    if "order_id" not in raw_order:
-        return is_valid == False
-    if "customer_id" not in raw_order:
-        return is_valid == False
-    if "customer_name" not in raw_order:
-        return is_valid == False
-    if "country" not in raw_order:
-        return is_valid == False
-    if "quantity" not in raw_order:
-        return is_valid == False
-    if "unit_price" not in raw_order:
-        return is_valid == False
-    if "status" not in raw_order:
-        return is_valid == False
-    if "email" not in raw_order:
-        return is_valid == False
+    required_keys = [
+        "order_id", "customer_id", "customer_name",
+        "country", "quantity", "unit_price", "status", "email"
+    ]
+    raw_keys = [k for k, v in raw_order.items()]
+    for key in required_keys:
+        if key not in raw_keys:
+            return False
+
+    if parse_int(raw_order["quantity"]) <= 0:
+        return False
+    if parse_float(raw_order["unit_price"]) <= 0:
+        return False
+
+    return True
 
 def transform_order(raw_order: dict) -> dict:
     order_value = parse_int(raw_order["quantity"]) * parse_float(raw_order["unit_price"])
@@ -90,150 +74,89 @@ def transform_order(raw_order: dict) -> dict:
     }
 
 def calculate_metrics(clean_orders: list[dict], invalid_orders: list[dict]) -> dict:
-    raw_orders_count = len(clean_orders) + len(invalid_orders)
-    valid_orders_count = len(clean_orders)
-    invalid_orders_count = len(invalid_orders)
     paid_orders_count = 0
     cancelled_orders_count = 0
     pending_orders_count = 0
     paid_revenue = 0
     total_revenue = 0
     high_orders_count = 0
-    countries = []
+    countries = set()
+
     for clean_order in clean_orders:
-        if clean_order["status"] == "paid":
+        status = clean_order["status"]
+        val = clean_order["order_value"]
+        total_revenue += val
+
+        if status == "paid":
             paid_orders_count += 1
-            paid_revenue += clean_order["order_value"]
-            total_revenue += clean_order["order_value"]
+            paid_revenue += val
         elif clean_order["status"] == "cancelled":
             cancelled_orders_count += 1
-            total_revenue += clean_order["order_value"]
         else:
             pending_orders_count += 1
-            total_revenue += clean_order["order_value"]
+
         if clean_order["order_tier"] == "high":
             high_orders_count += 1
-        countries.append(clean_order["country"])
-    unique_countries_count = len(set(countries))
+
+        countries.add(clean_order["country"])
+
     return {
-        "raw_orders_count": raw_orders_count,
-        "valid_orders_count": valid_orders_count,
-        "invalid_orders_count": invalid_orders_count,
+        "raw_orders_count": len(clean_orders) + len(invalid_orders),
+        "valid_orders_count": len(clean_orders),
+        "invalid_orders_count": len(invalid_orders),
         "paid_orders_count": paid_orders_count,
         "cancelled_orders_count": cancelled_orders_count,
         "pending_orders_count": pending_orders_count,
         "paid_revenue": paid_revenue,
         "total_revenue": total_revenue,
         "high_orders_count": high_orders_count,
-        "unique_countries_count": unique_countries_count,
+        "unique_countries_count": len(countries),
     }
 
 
 def print_report(metrics: dict) -> None:
-        print(f"Raw orders count: {metrics["raw_orders_count"]}")
-        print(f"Valid orders count: {metrics["valid_orders_count"]}")
-        print(f"Invalid orders count: {metrics["invalid_orders_count"]}")
-        print(f"Paid orders count: {metrics["paid_orders_count"]}")
-        print(f"Cancelled orders count: {metrics["cancelled_orders_count"]}")
-        print(f"Pending orders count: {metrics["pending_orders_count"]}")
-        print(f"Paid revenue: {metrics["paid_revenue"]:.2f}")
-        print(f"Total revenue: {metrics["total_revenue"]:.2f}")
-        print(f"High orders count: {metrics["high_orders_count"]}")
-        print(f"Unique countries count: {metrics["unique_countries_count"]}")
+        for key, value in metrics.items():
+            if "revenue" in key:
+                print(f"{key.replace("_", " ").capitalize()}: {value:.2f}")
+            else:
+                print(f"{key.replace("_", " ").capitalize()}: {value}")
 
 
 def main() -> None:
     raw_orders = [
-        {
-            "order_id": "1001",
-            "customer_id": "1",
-            "customer_name": " Anna Kowalska ",
-            "country": " pl ",
-            "quantity": "2",
-            "unit_price": "49.99",
-            "status": " Paid ",
-            "email": " ANNA@example.COM ",
-        },
-        {
-            "order_id": "1002",
-            "customer_id": "2",
-            "customer_name": "Jan Nowak",
-            "country": "DE",
-            "quantity": "1",
-            "unit_price": "199.90",
-            "status": "cancelled",
-            "email": None,
-        },
-        {
-            "order_id": "1003",
-            "customer_id": "3",
-            "customer_name": " Marta ",
-            "country": " fr ",
-            "quantity": "bad-data",
-            "unit_price": "29.99",
-            "status": "paid",
-            "email": "marta@example.com",
-        },
-        {
-            "order_id": "1004",
-            "customer_id": "4",
-            "customer_name": "Piotr Zielinski",
-            "country": "",
-            "quantity": "5",
-            "unit_price": "15.50",
-            "status": " pending ",
-            "email": "   ",
-        },
-        {
-            "order_id": "1005",
-            "customer_id": "5",
-            "customer_name": "Julia",
-            "country": "PL",
-            "quantity": "3",
-            "unit_price": "120.00",
-            "status": "PAID",
-            "email": "julia@example.com",
-        },
-        {
-            "order_id": "1006",
-            "customer_id": "6",
-            "customer_name": "Tomasz",
-            "country": "ES",
-            "quantity": "2",
-            "unit_price": "abc",
-            "status": "paid",
-            "email": "tomasz@example.com",
-        },
-        {
-            "order_id": "1007",
-            "customer_id": "7",
-            "customer_name": "Ewa",
-            "country": None,
-            "quantity": "1",
-            "unit_price": "89.99",
-            "status": "paid",
-            "email": "ewa@example.com",
-        },
+        {"order_id": "1001", "customer_id": "1", "customer_name": " Anna Kowalska ", "country": " pl ", "quantity": "2",
+         "unit_price": "49.99", "status": " Paid ", "email": " ANNA@example.COM "},
+        {"order_id": "1002", "customer_id": "2", "customer_name": "Jan Nowak", "country": "DE", "quantity": "1",
+         "unit_price": "199.90", "status": "cancelled", "email": None},
+        {"order_id": "1003", "customer_id": "3", "customer_name": " Marta ", "country": " fr ", "quantity": "bad-data",
+         "unit_price": "29.99", "status": "paid", "email": "marta@example.com"},
+        {"order_id": "1004", "customer_id": "4", "customer_name": "Piotr Zielinski", "country": "", "quantity": "5",
+         "unit_price": "15.50", "status": " pending ", "email": "   "},
+        {"order_id": "1005", "customer_id": "5", "customer_name": "Julia", "country": "PL", "quantity": "3",
+         "unit_price": "120.00", "status": "PAID", "email": "julia@example.com"},
+        {"order_id": "1006", "customer_id": "6", "customer_name": "Tomasz", "country": "ES", "quantity": "2",
+         "unit_price": "abc", "status": "paid", "email": "tomasz@example.com"},
+        {"order_id": "1007", "customer_id": "7", "customer_name": "Ewa", "country": None, "quantity": "1",
+         "unit_price": "89.99", "status": "paid", "email": "ewa@example.com"},
     ]
 
     clean_orders = []
     invalid_orders = []
 
-    for raw_order in raw_orders:
-        validate_orders = validate_order(raw_order)
-        clean_order = transform_order(raw_order)
-        if validate_orders == False:
+    for index, raw_order in enumerate(raw_orders):
+        if not validate_order(raw_order):
             invalid_orders.append(raw_order)
-        else:
-            clean_orders.append(clean_order)
             continue
+        clean_order = transform_order(raw_order)
+        clean_orders.append(clean_order)
 
     metrics = calculate_metrics(clean_orders, invalid_orders)
     print_report(metrics)
 
-
     print(clean_orders)
     print(invalid_orders)
+
+
 if __name__ == "__main__":
     main()
 
