@@ -1,0 +1,94 @@
+
+
+# Zadania 007
+
+order = {"order_id": 1001}
+# print(order["total_amount"])
+# blad KeyError, poniewaz nie ma key total_amount w dict order
+
+order = {"order_id": 1001}
+print(order.get("total_amount", 0))
+
+amount = "129.99"
+tax = 23
+
+print(float(amount) + tax)
+# Dostaje blad TypeError
+
+def parse_amount(raw_amount: str) -> float:
+    try:
+        amount = float(raw_amount)
+    except ValueError:
+        amount = 0
+    return amount
+
+print(parse_amount("129.90"))
+print(parse_amount("abc"))
+print(parse_amount(""))
+
+def parse_amount_strict(raw_amount: str) -> float:
+    try:
+        amount = float(raw_amount)
+    except ValueError:
+        raise ValueError("Invalid amount")
+    return amount
+
+values = ["129.90", "abc", "80"]
+
+for value in values:
+    try:
+        print(parse_amount_strict(value))
+    except ValueError:
+        print(f"Cannot parse amount: {value}")
+
+def validate_order(order: dict) -> None:
+    required_keys = ["order_id", "amount", "status"]
+    order_keys = [k for k, v in order.items()]
+    for key in required_keys:
+        if key not in order_keys:
+            raise ValueError
+
+orders = [
+    {"order_id": 1, "amount": "100", "status": "paid"},
+    {"order_id": 2, "status": "paid"},
+    {"order_id": 3, "amount": "abc", "status": "cancelled"},
+]
+
+for order in orders:
+    order_id = order["order_id"]
+    amount = order.get("amount")
+    try:
+        validate_order(order)
+        amount = parse_amount(amount)
+    except ValueError as e:
+        print(f"{type(e).__name__}")
+        continue
+    print(order_id, amount)
+
+#result = 10 / 0
+#print(result)
+# Dostaje blad ZeroDivisionError, nie mozna dzielic przez 0
+
+raw_amount = "abc"
+try:
+    float(raw_amount)
+except ValueError as exc:
+    print(f"Cannot parse amount: {exc}")
+
+values = ["100", "abc", "250", ""]
+
+for value in values:
+    try:
+        print(float(value))
+    except ValueError as e:
+        print(f"Cannot parse value: {e}")
+
+try:
+    print(custumer_name)
+except ValueError:
+    print("something went wrong")
+# Jest to zly pomysl, poniewaz uzywajac except Exception ukrywamy wszystkie bledy
+
+
+
+
