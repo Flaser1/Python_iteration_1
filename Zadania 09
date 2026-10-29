@@ -1,0 +1,157 @@
+
+
+orders = [
+    {"id": 101, "customer_id": 1, "status": "paid", "amount": 120, "country": " pl "},
+    {"id": 102, "customer_id": 2, "status": "pending", "amount": 80, "country": "DE"},
+    {"id": 103, "customer_id": 1, "status": "paid", "amount": 0, "country": None},
+    {"id": 104, "customer_id": 3, "status": "paid", "amount": 300, "country": "PL"},
+    {"id": 105, "customer_id": 2, "status": "cancelled", "amount": 50},
+    {"id": 999, "customer_id": 999, "status": "paid", "amount": None}
+]
+# Sprawdzenie wlasnego rozwiazania
+orders = []
+
+orders_ids1 = []
+orders_ids2 = [order["id"] for order in orders]
+
+for order in orders:
+    orders_ids1.append(order["id"])
+
+print(orders_ids1)
+print(orders_ids2)
+print(orders_ids1 == orders_ids2)
+
+paid_ids = [order["id"] for order in orders if order["status"] == "paid"]
+large_paid_ids = [order["id"] for order in orders if order["status"] == "paid" and order["amount"] is not None and order["amount"] >= 100]
+print(paid_ids)
+print(large_paid_ids)
+
+orders_with_flag = [{"id": order["id"], "customer_id": order["customer_id"], "amount": order["amount"], "is_paid": order["status"] == "paid"} for order in orders]
+print(orders_with_flag)
+
+def get_order_tier(amount: str | None) -> None:
+    try:
+        if amount >= 200:
+            return "high"
+    except TypeError:
+        return "standard"
+    return "standard"
+
+
+orders_order_tier = [get_order_tier(order["amount"]) for order in orders]
+paid_orders_order_tier = [get_order_tier(order["amount"]) for order in orders if order["status"] == "paid"]
+print(orders_order_tier)
+print(paid_orders_order_tier)
+
+def normalize_country(country: str) -> None:
+    if country is None or country.strip() == "":
+        return "UNKNOWN"
+
+    return country.strip().upper()
+
+ids_countries = [{"id": order["id"], "country": normalize_country(order.get("country"))} for order in orders]
+print(ids_countries)
+
+paid_countries = { order["country"].strip().upper() for order in orders if order.get("country") is not None and order["country"].strip() != "" and order["status"] == "paid"}
+print(paid_countries)
+
+paid_amount_by_id = {order["id"]: order["amount"] for order in orders if order["status"] == "paid"}
+print(paid_amount_by_id)
+print(paid_amount_by_id.get(103))
+print(paid_amount_by_id.get(999))
+
+
+paid_orders_amounts = [order["amount"] for order in orders if order["amount"] is not None and order["status"] == "paid"]
+if paid_orders_amounts:
+    sum = sum(paid_orders_amounts)
+    min = min(paid_orders_amounts)
+    max = max(paid_orders_amounts)
+    avg = sum / len(paid_orders_amounts)
+else:
+    sum = 0
+    min = None
+    max = None
+    avg = None
+
+print(paid_orders_amounts)
+print(sum)
+print(min)
+print(max)
+print(avg)
+
+
+
+
+is_paid = [order.get("status") == "paid" for order in orders]
+is_paid = []
+has_paid = any(is_paid)
+all_paid = all(is_paid)
+can_publish_paid_only = len(is_paid) > 0 and all_paid
+print(is_paid)
+print(has_paid)
+print(all_paid)
+print(can_publish_paid_only)
+
+index_id = {index: order["id"] for index, order in enumerate(orders, start = 1)}
+records = [{"row_number": index, "id": order["id"], "status": order["status"]} for index, order in enumerate(orders)]
+print(index_id)
+print(records)
+
+orders_with_items = [
+    {"id": 1, "status": "paid", "items": [{"sku": "SQL", "quantity": 2}, {"sku": "PY", "quantity": 1}]},
+    {"id": 2, "status": "cancelled", "items": [{"sku": "SQL", "quantity": 4}]},
+    {"id": 3, "status": "paid", "items": []},
+]
+
+order_items = [{"order_id": order["id"], "sku": item["sku"], "quantity": item["quantity"]} for order in orders_with_items for item in order.get("items", [])]
+order_items_loop = []
+print(order_items)
+for order in orders_with_items:
+    for item in order.get("items", []):
+        order_items_loop.append({"order_id": order["id"], "sku": item["sku"], "quantity": item["quantity"]})
+print(order_items == order_items_loop)
+
+rows = [{"id": 1, "amount": 10}, {"id": 1, "amount": 20}, {"id": 2, "amount": 0}]
+
+last_amount_by_id = {order["id"]: order["amount"] for order in rows}
+total_amount_by_id = {}
+for order in rows:
+    id = order["id"]
+    amount = order["amount"]
+    if id not in total_amount_by_id:
+        total_amount_by_id[id] = {
+            "amount": 0
+        }
+    total_amount_by_id[id]["amount"] += amount
+print(last_amount_by_id)
+print(total_amount_by_id)
+
+
+source = [{"id": 1, "status": "paid"}, {"id": 2, "status": "pending"}]
+
+selected = [order["id"] for order in source if order["status"] == "paid"]
+independent = [{"id": order["id"], "status": "archive"} for order in source]
+print(selected[0])
+print(source[0])
+print(independent[0])
+
+raw_amounts = ["10", "abc", "0", "20"]
+amounts = []
+invalid_amounts = []
+
+for index, amount in enumerate(raw_amounts):
+    try:
+        amounts.append(float(amount))
+    except ValueError as ve:
+        invalid_amounts.append({index: str({ve})})
+amounts_tier = ["positive" if amount > 0 else "zero" for amount in amounts]
+print(amounts_tier)
+print(amounts)
+print(invalid_amounts)
+
+
+
+
+
+
+
