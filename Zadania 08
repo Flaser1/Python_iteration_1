@@ -1,0 +1,230 @@
+
+
+def parse_amount(raw_amount: str) -> float:
+    amount = raw_amount.replace(",", ".").strip()
+    if amount is None or amount == "":
+        raise ValueError
+    amount = float(amount)
+    if amount < 0:
+        raise ValueError
+    return amount
+
+
+def normalize_country(country: str | None) -> str:
+    if country is None or country.strip() == "":
+        return "UNKNOWN"
+
+    return country.strip().upper()
+
+
+def get_order_tier(amount: float) -> str:
+    if amount >= 200:
+        return "high"
+
+    return "standard"
+
+
+def transform_order(raw_order: dict) -> dict:
+    requirded_keys = ["id", "amount", "status"]
+    for key in requirded_keys:
+        if key not in raw_order:
+            raise KeyError
+    status = raw_order["status"].strip().lower()
+    allowed_statuses = ["paid", "pending", "cancelled"]
+    if status not in allowed_statuses:
+        raise ValueError
+    amount = parse_amount(raw_order["amount"])
+
+    return {
+        "order_id": int(raw_order["id"]),
+        "country": normalize_country(raw_order["country"]),
+        "amount": amount,
+        "status": status,
+        "order_tier": get_order_tier(amount),
+    }
+
+def validate_order(raw_order: list[dict], index: int, rejected_list: list) -> dict | bool:
+    try:
+        return transform_order(raw_order)
+    except KeyError as ke:
+        raw_id = raw_order.get("id")
+        rejected_list.append({
+            "order_index": index,
+            "id": raw_id,
+            "reason": str({ke})
+        })
+        return False
+    except ValueError as ve:
+        raw_id = raw_order.get("id")
+        rejected_list.append({
+            "order_index": index,
+            "id": raw_id,
+            "reason": str({ve})
+        })
+        return False
+
+
+
+#raw_orders = [
+   # {"id": "1", "country": " pl ", "amount": "120.50", "status": "paid"},
+   # {"id": "2", "country": "DE", "amount": "80", "status": "cancelled"},
+   # {"id": "3", "country": None, "amount": "200", "status": "paid"},
+   ## {"id": "4", "country": " fr ", "amount": "bad-data", "status": "paid"},
+   # {"id": "5", "country": "PL", "amount": "300", "status": "pending"},
+   # {"id": "6", "country": "   ", "amount": "0", "status": " PAID "},
+  #  {"id": "7", "country": "PL", "status": "paid"},
+#]
+#clean_orders = []
+#invalid_orders = []
+
+#for raw_order in raw_orders:
+    #try:
+     #   clean_order = transform_order(raw_order)
+     #   clean_orders.append(clean_order)
+   # except KeyError:
+   #     invalid_orders.append(raw_order)
+   #     continue
+   ## except ValueError:
+   #     invalid_orders.append(raw_order)
+   #     continue
+
+
+#orders_count = 0
+#paid_orders_count = 0
+#cancelled_orders_count = 0
+#paid_revenue = 0
+#high_orders_count = 0
+
+#for order in clean_orders:
+   # val = order["amount"]
+    #status = order["status"]
+
+    #if status == "paid":
+        #paid_orders_count += 1
+        #paid_revenue += val
+    #if status == "cancelled":
+       # cancelled_orders_count += 1
+    #if order["order_tier"] == "high":
+     #   high_orders_count += 1
+
+    #orders_count += 1
+
+#print(f"Orders count: {orders_count}")
+#print(f"Paid orders count: {paid_orders_count}")
+#print(f"Cancelled orders count: {cancelled_orders_count}")
+#print(f"Paid revenue: {paid_revenue:.2f}")
+#print(f"High orders count: {high_orders_count}")
+
+def calculate_metrics(clean_orders: list[dict], invalid_orders: list[dict]) -> dict:
+    orders_count = 0
+    paid_orders_count = 0
+    cancelled_orders_count = 0
+    paid_revenue = 0
+    high_orders_count = 0
+    clean_orders_revenue = 0
+
+    for order in clean_orders:
+        val = order["amount"]
+        status = order["status"]
+        if status == "paid":
+            paid_orders_count += 1
+            paid_revenue += val
+        if status == "cancelled":
+            cancelled_orders_count += 1
+        if order["order_tier"] == "high":
+            high_orders_count += 1
+        orders_count += 1
+        clean_orders_revenue += val
+
+    return {
+        "Valid orders count": len(clean_orders),
+        "Invalid orders count": len(invalid_orders),
+        "Valid orders revenue": clean_orders_revenue,
+        "Orders count": orders_count,
+        "Paid orders count": paid_orders_count,
+        "Cancelled orders count": cancelled_orders_count,
+        "Paid revenue": paid_revenue,
+        "High orders count": high_orders_count
+   }
+
+def print_raport(metrics: dict) -> None:
+    for key, value in metrics.items():
+        if "revenue" in key:
+            print(f"{key}: {value:.2f}")
+        else:
+            print(f"{key}: {value}")
+
+def paid_by_country(clean_orders: list[dict]) -> None:
+    orders_count = 0
+    revenue = 0
+    revenue = round(revenue, 2)
+    paid_by_country = {}
+    for clean_order in clean_orders:
+        country = clean_order["country"]
+        val = clean_order["amount"]
+        val = round(val, 2)
+        if clean_order["status"] == "paid":
+            if country not in paid_by_country:
+                paid_by_country[country] = {
+                    "orders_count": orders_count,
+                    "revenue": revenue
+                }
+            paid_by_country[country]["orders_count"] += 1
+            paid_by_country[country]["revenue"] += val
+    paid_by_country = dict(sorted(paid_by_country.items()))
+    print(paid_by_country)
+
+
+def main():
+    #raw_orders = []
+    #Dziala, wszedzie 0 i puste listy
+    raw_orders = [
+    {"id": "1", "country": " pl ", "amount": "120.50", "status": "paid"},
+    {"id": "2", "country": "DE", "amount": "80", "status": "cancelled"},
+    {"id": "3", "country": None, "amount": "200", "status": "paid"},
+    {"id": "4", "country": " fr ", "amount": "bad-data", "status": "paid"},
+    {"id": "5", "country": "PL", "amount": "300", "status": "pending"},
+    {"id": "6", "country": "   ", "amount": "0", "status": " PAID "},
+    {"id": "7", "country": "PL", "status": "paid"},
+]
+
+    clean_orders = []
+    invalid_orders = []
+    rejected_records_reason = []
+
+    for index, raw_order in enumerate(raw_orders):
+        result = validate_order(raw_order, index, rejected_records_reason)
+        if result is False:
+            invalid_orders.append(raw_order)
+            continue
+        clean_orders.append(result)
+
+
+
+    metrics = calculate_metrics(clean_orders, invalid_orders)
+    print_raport(metrics)
+
+    print(clean_orders)
+    print(invalid_orders)
+    print(rejected_records_reason)
+
+    paid_by_country(clean_orders)
+
+    quality_summary = {
+        "raw orders count": len(raw_orders),
+        "clean orders count": len(clean_orders),
+        "invalid orders count": len(invalid_orders),
+        "is_balanced": len(raw_orders) == len(clean_orders) + len(invalid_orders)
+    }
+    print(quality_summary)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
