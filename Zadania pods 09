@@ -1,1 +1,142 @@
 
+
+customers = [
+    {"customer_id": 1, "name": " Anna ", "country": "pl", "email": "anna@example.com"},
+    {"customer_id": 2, "name": "Jan", "country": "DE", "email": None},
+    {"customer_id": 3, "name": "Marta", "country": " fr ", "email": "marta@example.com"},
+]
+
+clean_customers = []
+for customer in customers:
+    customer_id = customer["customer_id"]
+    clean_name = customer["name"].strip()
+    clean_country = customer["country"].strip().upper()
+    if customer["email"] is None:
+        clean_email = "missing_email"
+    else:
+        clean_email = customer["email"].strip().lower()
+    clean_customer = {
+        "customer_id": customer_id,
+        "name": clean_name,
+        "country": clean_country,
+        "email": clean_email
+    }
+    clean_customers.append(clean_customer)
+print(clean_customers)
+
+orders = [
+    {"order_id": 1001, "customer_id": 1, "amount": 120, "status": "paid"},
+    {"order_id": 1002, "customer_id": 2, "amount": 80, "status": "cancelled"},
+    {"order_id": 1003, "customer_id": 1, "amount": 200, "status": "paid"},
+]
+
+paid_orders = [order["amount"] for order in orders if order["status"] == "paid"]
+paid_revenue = sum(paid_orders)
+print(paid_revenue)
+
+def get_customer_orders(customer_id: int, orders: list[dict]) -> list[dict]:
+    orders_by_customer = [order for order in orders if customer_id == order["customer_id"]]
+    return orders_by_customer
+
+print(get_customer_orders(1, orders))
+
+def build_customer_summary(customer: dict, orders: list[dict]) -> dict:
+    customer_id = customer["customer_id"]
+    customer_name = customer["name"]
+    customer_orders = get_customer_orders(customer_id, orders)
+    orders_count = len(customer_orders)
+    paid_revenue = sum(
+        order["amount"] for order in customer_orders if order["status"] == "paid"
+    )
+    avg_order_value = paid_revenue / orders_count if orders_count > 0 else None
+
+    return {
+        "customer_id": customer_id,
+        "name": customer_name,
+        "orders_count": orders_count,
+        "paid_revenue": paid_revenue,
+        "average_order_value": avg_order_value
+    }
+print(build_customer_summary(clean_customers[0], orders))
+
+def build_all_summaries(customers: list[dict], orders: list[dict]) -> list[dict]:
+    summaries = []
+    for customer in customers:
+        summary = build_customer_summary(customer, orders)
+
+        summaries.append({
+            **summary,
+            "country": customer["country"],
+            "customer_status": "buyer" if summary["orders_count"] > 0 else "no_orders",
+        })
+    return sorted(summaries, key=lambda s: (-s["paid_revenue"], s["customer_id"]))
+
+summary = build_all_summaries(clean_customers, orders)
+print(summary)
+
+customers_by_id = {customer["customer_id"]: customer for customer in clean_customers}
+new_order = {"order_id": 1004, "customer_id": 999, "amount": 50, "status": "paid"}
+orders_copy = [*orders, new_order]
+unknown_customer_orders = [order for order in orders_copy if order["customer_id"] not in customers_by_id]
+print(customers_by_id)
+print(unknown_customer_orders)
+
+
+def build_country_report(customers: list[dict], orders: list[dict]) -> dict:
+    countries_summary = {}
+    paying_customers = {}
+    for customer in customers:
+        country = customer["country"]
+        if country not in countries_summary:
+            countries_summary[country] = {
+                "customers_count": 0,
+                "paying_customers_count": 0,
+                "paid_orders_count": 0,
+                "paid_revenue": 0,
+            }
+            paying_customers[country] = set()
+        countries_summary[country]["customers_count"] += 1
+
+    customer_country = {customer["customer_id"]: customer["country"] for customer in customers}
+    for order in orders:
+        if order["status"] != "paid":
+            continue
+        customer_id = order["customer_id"]
+        country = customer_country.get(customer_id)
+        if country is None:
+            continue
+        countries_summary[country]["paid_orders_count"] += 1
+        countries_summary[country]["paid_revenue"] += order["amount"]
+        paying_customers[country].add(customer_id)
+
+    for country in countries_summary:
+        countries_summary[country]["paying_customers_count"] = len(paying_customers[country])
+
+    return countries_summary
+
+def print_country_report(report: dict) -> None:
+    for country in sorted(report):
+        print(country, report[country])
+
+report = build_country_report(clean_customers, orders)
+print_country_report(report)
+
+customers_with_email = [
+    {
+     "customer_id": customer["customer_id"],
+     "name": customer["name"],
+     "email": customer["email"],
+    }
+    for customer in clean_customers
+    if customer["email"] != "missing_email"
+]
+
+recipient_countries = {
+    customer["country"] for customer in clean_customers
+    if customer["email"] != "missing_email"
+    }
+
+print(customers_with_email)
+print(sorted(recipient_countries))
+
+
