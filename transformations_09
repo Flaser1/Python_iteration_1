@@ -1,0 +1,20 @@
+
+
+def normalize_customers(customers: list[dict]) -> list[dict]:
+    clean_customers = []
+    for customer in customers:
+        customer_id = customer["customer_id"]
+        clean_name = customer["name"].strip()
+        clean_country = customer["country"].strip().upper()
+        if customer["email"] is None:
+            clean_email = "missing_email"
+        else:
+            clean_email = customer["email"].strip().lower()
+        clean_customer = {
+            "customer_id": customer_id,
+            "name": clean_name,
+            "country": clean_country,
+            "email": clean_email,
+        }
+        clean_customers.append(clean_customer)
+    return clean_customers
